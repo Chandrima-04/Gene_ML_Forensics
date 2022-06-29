@@ -1,0 +1,10 @@
+Feature_Name,Classifier,Preprocessing,Method_Name,Best_Score,Mean_Score,Standard_Deviation
+city_elevation_meters,Mixed,Clr,mixed_clr,0.937694704,0.920146669,0.015427667
+city_koppen_climate,Mixed,Clr,mixed_clr,0.960725076,0.930433031,0.016858938
+coastal,Mixed,Clr,mixed_clr,0.929411765,0.909867257,0.012373332
+coastal_city,Mixed,Clr,mixed_clr,0.924471299,0.909282248,0.010822587
+location_type,Mixed,Clr,mixed_clr,0.888446215,0.857895403,0.021644751
+surface,Random Forest,Standard Scalar,random_forest standard_scalar,0.496428571,0.472877478,0.017741301
+surface_material,Random Forest,Standard Scalar,random_forest standard_scalar,0.563218391,0.543737106,0.017802243
+surface_ontology_fine,Random Forest,Standard Scalar,random_forest standard_scalar,0.693693694,0.66275401,0.024838775
+surface_ontology_coarse,Random Forest,Standard Scalar,random_forest standard_scalar,0.869369369,0.854581263,0.012755269

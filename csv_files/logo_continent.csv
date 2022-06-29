@@ -1,0 +1,10 @@
+Feature_Name,Classifier,Preprocessing,Method_Name,Best_Score,Mean_Score,Standard_Deviation
+city_elevation_meters,Logistic Regression,Multiplicative Replacement,logistic_regression_multiplicative_replacement,0.067567568,0.010207654,0.023455441
+city_koppen_climate,Random Forest,Standard Scalar,random_forest standard_scalar,0.354545455,0.127450382,0.133851352
+coastal,Logistic Regression,Multiplicative Replacement,logistic_regression_multiplicative_replacement,0.666666667,0.408344302,0.132331158
+coastal_city,Logistic Regression,Multiplicative Replacement,logistic_regression_multiplicative_replacement,0.58048433,0.40591885,0.100953206
+location_type,Random Forest,Standard Scalar,random_forest standard_scalar,1,0.406186559,0.321156487
+surface,Random Forest,Standard Scalar,random_forest standard_scalar,0.081081081,0.038034263,0.025300207
+surface_material,Random Forest,Standard Scalar,random_forest standard_scalar,1,0.325383757,0.260308825
+surface_ontology_coarse,Random Forest,Standard Scalar,random_forest standard_scalar,1,0.830849991,0.098023404
+surface_ontology_fine,Random Forest,Standard Scalar,random_forest standard_scalar,1,0.618566863,0.153290487
