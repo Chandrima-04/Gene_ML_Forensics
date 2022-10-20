@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #Importing Necessary Libraries for the Code
 suppressPackageStartupMessages(suppressWarnings(library(ggplot2)))
+suppressPackageStartupMessages(suppressWarnings(library(lattice)))
 suppressPackageStartupMessages(suppressWarnings(library(tidyverse)))
 suppressPackageStartupMessages(suppressWarnings(library(patchwork)))
 suppressPackageStartupMessages(suppressWarnings(library(RColorBrewer)))
@@ -44,33 +45,35 @@ tara_taxa <- read.csv("csv_files/tara_taxa_all.csv")
 ```{r}
 #city precision/recall
 city_meta <- metapred_city[metapred_city$Noise==0,]
-ggplot(data=city_meta, aes(y=Precision, x=Recall, color=Classifier, shape=Preprocessing)) + geom_point(size=2)  + 
-  labs(title="Precision vs Recall for MetaSUB City") + theme(legend.title = element_text(size=7), legend.text = element_text(size=7))
+city_meta <- city_meta[city_meta$Classifier=="linear_svc" | city_meta$Classifier=="logistic_regression"| city_meta$Classifier=="random_forest"| city_meta$Classifier=="extra_tree"| city_meta$Classifier=="svm",]
+ggplot(data=city_meta, aes(y=Precision, x=Recall, color=Classifier, shape=Preprocessing)) + stat_ellipse()  + geom_point(size=2)  + labs(title="Precision vs Recall for MetaSUB City") + theme(legend.title = element_text(size=7), legend.text = element_text(size=7)) + theme_bw()
 ```
 
 ```{r}
-ggplot(data=city_meta, aes(x=Accuracy, y=Training_Time_in_sec, color=Classifier, fill=Classifier)) +
-geom_point(size=2)  + stat_ellipse() + 
-  labs(title="Accuracy vs Training Time for MetaSUB City")
+ggplot(data = city_meta, aes(y = Training_Time_in_sec, x = Preprocessing, fill=Preprocessing)) + facet_grid(. ~Classifier) + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank(), legend.position="bottom" ) + geom_bar(stat = 'identity') +  labs(title="Training Time in Second") + ylab("Training Time in Seconds") + xlab("Preprocessing Method")+ theme_bw()
 ```
+
 ```{r}
+city_noise <- metapred_city[metapred_city$Classifier=="linear_svc" | metapred_city$Classifier=="logistic_regression"| metapred_city$Classifier=="random_forest"| metapred_city$Classifier=="extra_tree"| metapred_city$Classifier=="svm",]
 ggplot(data=city_noise, aes(x=log(Noise), y=Accuracy, color=Classifier, linetype=Preprocessing, shape=Preprocessing)) +geom_line()+
   geom_point()  +
-  labs(title="Effect of Gaussian Noise (Model Stability) for the best model") +
-  theme(legend.title = element_text(size=7))
-```
-```{r}
-#cont precision/recall
-cont_meta <- metapred_city[metapred_cont$Noise==0,]
-ggplot(data=cont_meta, aes(y=Precision, x=Recall, color=Classifier, shape=Preprocessing)) + geom_point(size=2)  + 
-  labs(title="Precision vs Recall for MetaSUB Continent") + theme(legend.title = element_text(size=7), legend.text = element_text(size=7))
+  labs(title="Effect of Gaussian Noise for the Top 5 model") +
+  theme(legend.title = element_text(size=7)) + theme_bw()
 ```
 
+
+```{r}
+#cont precision/recall
+cont_meta <- metapred_cont[metapred_cont$Noise==0,]
+cont_meta <- cont_meta[cont_meta$Classifier=="linear_svc" | cont_meta$Classifier=="logistic_regression"| cont_meta$Classifier=="random_forest"| cont_meta$Classifier=="extra_tree"| cont_meta$Classifier=="svm",]
+ggplot(data=cont_meta, aes(y=Precision, x=Recall, color=Classifier, shape=Preprocessing)) + geom_point(size=2)  + 
+  labs(title="Precision vs Recall for MetaSUB Continent") + theme(legend.title = element_text(size=7), legend.text = element_text(size=7)) + theme_bw()
+```
 
 
 ```{r}
 #data interpolation
-pheatmap(cv_comp,gaps_col=3, cluster_rows=FALSE, cluster_cols=FALSE, main = "Cross-validation for data Interpolation") 
+pheatmap(cv_comp,gaps_col=3, cluster_rows=FALSE, cluster_cols=FALSE, main = "Cross-validation for data Interpolation") + theme_bw()
 ```
 
 ```{r}
@@ -99,14 +102,15 @@ data_frame_merge <- merge(species_metric, DF, by = 'species', all = F)
 ggplot(data_frame_merge, aes(x= -log(species_abundance), y= -log(species_prevalance))) + 
   geom_point() +
   stat_poly_line() +
-  stat_poly_eq() 
+  stat_poly_eq()  +  labs(title="Species Abundance vs Species Prevalance") + ylab("-log(Species Prevalance)") + xlab("-log(Species Abundance)") + theme_bw()
 ```
 
 ```{r}
 ggplot(data_frame_merge, aes(x= -log(species_abundance), y= -log(feature_importance))) + 
   geom_point() +
   stat_poly_line() +
-  stat_poly_eq() 
+  stat_poly_eq() +  labs(title="Species Abundance vs Feature Importance") + ylab("-log(Feature Importance)") + xlab("-log(Species Abundance)") + theme_bw()
+
 ```
 
 
@@ -114,7 +118,7 @@ ggplot(data_frame_merge, aes(x= -log(species_abundance), y= -log(feature_importa
 ggplot(data_frame_merge, aes(x= -log(species_prevalance), y= -log(feature_importance))) + 
   geom_point() +
   stat_poly_line() +
-  stat_poly_eq() 
+  stat_poly_eq()  +  labs(title="Species Prevalance vs Feature Importance") + ylab("-log(Feature Importance)") + xlab("-log(Species Prevalance)") + theme_bw()
 ```
 
 ```{r}
@@ -126,8 +130,8 @@ city <- melt(city_abun, id.var = 'species', na.rm = TRUE)
 city$variable = NULL
 city <- city[city$value!=0,]
 city$value <- as.numeric(city$value)
-ggplot(city, aes(x=species, y=-log(value), fill=species)) +
-  geom_boxplot(outlier.shape = NA) + theme(axis.text.x = element_text(angle = 90), legend.position="none")
+ggplot(city, aes(x=species, y=-log(value))) +
+  geom_boxplot(outlier.shape = NA) + theme(axis.text.x = element_text(angle = 90, hjust=0.95,vjust=0.2), legend.position="none") 
 ```
 
 ```{r}
@@ -136,8 +140,8 @@ cont_abun <- data.frame(species = row.names(cont_abun), cont_abun)
 cont <- melt(cont_abun, id.var = 'species', na.rm = TRUE)
 cont$value <- as.numeric(cont$value)
 cont <- cont[cont$value!=0,]
-ggplot(cont, aes(x=species, y=-log(value), fill=species)) +
-  geom_boxplot(outlier.shape = NA) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="none")
+ggplot(cont, aes(x=species, y=-log(value))) +
+  geom_boxplot(outlier.shape = NA) + theme(axis.text.x = element_text(angle = 90, hjust=0.95,vjust=0.2), legend.position="none") 
 ```
 
 
@@ -149,14 +153,14 @@ tara <- tara_taxa[tara_taxa$Noise==0,]
 ggplot(data=tara, aes(y=Accuracy, x=-log(Training_Time_in_sec), color=Taxonomic_classification, shape=Name)) +
   geom_point(size=4)  + 
   scale_color_manual(values=c("royalblue1", "coral1", "darkolivegreen", "darkorchid", "deeppink", "goldenrod1")) +
-  labs(title="Model Accuracy vs Time Taken for model Training on given TARA Taxonomic Classification")
+  labs(title="Model Accuracy vs Time Taken for model Training on given TARA Taxonomic Classification")+ theme_bw()
 ```
 
 ```{r}
 ggplot(data=tara, aes(x=Precision, y=Recall, color=Taxonomic_classification, shape=Name)) +
   geom_point(size=4) +
   scale_color_manual(values=c("royalblue1", "coral1", "darkolivegreen", "darkorchid", "deeppink", "goldenrod1"))+
-  labs(title="Model Precision and Recall on given TARA Taxonomic Classification")
+  labs(title="Model Precision and Recall on given TARA Taxonomic Classification") + theme_bw()
 ```
 
 ```{r}
@@ -164,7 +168,7 @@ ggplot(data=tara_taxa, aes(x=log(Noise), y=Accuracy, color=Taxonomic_classificat
   geom_line()+
   geom_point() + 
   scale_color_manual(values=c("royalblue1", "coral1", "darkolivegreen", "darkorchid", "deeppink", "goldenrod1")) +
-  labs(title="Effect of Gaussian Noise (Model Stability) for the best model prediction")
+  labs(title="Effect of Gaussian Noise (Model Stability) for the best model prediction") + theme_bw()
 ```
 
 ```{}
